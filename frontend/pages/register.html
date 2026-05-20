@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="fr">
+<head>
+    <meta charset="utf-8" />
+    <title>Inscription</title>
+    <link rel="stylesheet" href="/css/style.css" />
+</head>
+<body>
+    <main class="container">
+        <h1>Créer un compte</h1>
+
+        <form id="registerForm" class="card">
+            <input name="firstname" placeholder="Prénom" required />
+            <input name="lastname" placeholder="Nom" required />
+            <input name="username" placeholder="Nom d'utilisateur" required />
+            <input name="email" type="email" placeholder="Email" required />
+            <input name="password" type="password" placeholder="Mot de passe" required />
+            <button type="submit">Créer mon compte</button>
+        </form>
+
+        <p id="message"></p>
+    </main>
+
+    <script src="/js/api.js"></script>
+    <script>
+        registerForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const data = Object.fromEntries(new FormData(registerForm));
+
+            try {
+                const res = await api('/auth/register', {
+                    method: 'POST',
+                    body: JSON.stringify(data)
+                });
+
+                message.textContent = res.message;
+                registerForm.reset();
+            } catch (err) {
+                message.textContent = err.message;
+            }
+        });
+    </script>
+</body>
+</html>

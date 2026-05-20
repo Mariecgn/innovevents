@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="fr">
+<head>
+    <meta charset="utf-8">
+
+    <title>Demande de devis</title>
+
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+
+<body>
+    <main class="container">
+        <h1>Demande de devis</h1>
+
+        <form id="f">
+
+            <input
+                name="company_name"
+                placeholder="Nom de l'entreprise"
+                required
+            >
+
+            <input
+                name="firstname"
+                placeholder="Prénom"
+                required
+            >
+
+            <input
+                name="lastname"
+                placeholder="Nom"
+                required
+            >
+
+            <input
+                name="email"
+                type="email"
+                placeholder="Email"
+                required
+            >
+
+            <input
+                name="phone"
+                placeholder="Téléphone"
+                required
+            >
+
+            <input
+                name="location"
+                placeholder="Lieu"
+                required
+            >
+
+            <select name="event_type">
+                <option>Séminaire</option>
+                <option>Conférence</option>
+                <option>Soirée d'entreprise</option>
+                <option>Autre</option>
+            </select>
+
+            <input
+                name="desired_date"
+                type="date"
+                required
+            >
+
+            <input
+                name="estimated_participants"
+                type="number"
+                placeholder="Participants"
+                required
+            >
+
+            <textarea
+                name="need_description"
+                placeholder="Besoin en quelques mots"
+                required
+            ></textarea>
+
+            <button type="submit">
+                Envoyer
+            </button>
+
+        </form>
+
+        <p id="msg"></p>
+    </main>
+
+    <script src="/js/api.js"></script>
+
+    <script>
+        f.onsubmit = async (e) => {
+            e.preventDefault();
+
+            try {
+                const data = await api('/prospects', {
+                    method: 'POST',
+                    body: JSON.stringify(
+                        Object.fromEntries(new FormData(f))
+                    )
+                });
+
+                msg.textContent = data.message;
+
+                f.reset();
+
+            } catch (err) {
+                msg.textContent = err.message;
+            }
+        };
+    </script>
+</body>
+</html>

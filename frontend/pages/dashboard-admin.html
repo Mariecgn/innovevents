@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="fr">
+    <head>
+        <meta charset="utf-8" />
+
+        <title>Dashboard admin</title>
+
+        <link
+            rel="stylesheet"
+            href="/css/style.css"
+        />
+    </head>
+
+    <body>
+        <main class="container">
+            <h1>
+                Tableau de bord administrateur
+            </h1>
+
+            <section
+                id="dash"
+                class="grid"
+            ></section>
+
+            <h2>Prospects</h2>
+
+            <section id="prospects"></section>
+        </main>
+
+        <script src="/js/api.js"></script>
+
+        <script>
+            async function load() {
+                const d = await api(
+                    '/dashboard/admin'
+                );
+
+                dash.innerHTML = `
+                    <div class="card">
+                        Clients actifs :
+                        ${d.stats.clients_actifs}
+                    </div>
+
+                    <div class="card">
+                        Événements brouillon :
+                        ${d.stats.events_brouillon}
+                    </div>
+
+                    <div class="card">
+                        Prochains événements :
+                        ${d.events.length}
+                    </div>
+                `;
+
+                const p = await api(
+                    '/prospects'
+                );
+
+                prospects.innerHTML = p
+                    .map(
+                        (x) => `
+                        <div class="card">
+                            ${x.company_name}
+                            -
+                            ${x.firstname}
+                            ${x.lastname}
+
+                            <button
+                                onclick="convert(${x.id})"
+                            >
+                                Convertir en client
+                            </button>
+                        </div>
+                    `
+                    )
+                    .join('');
+            }
+
+            async function convert(id) {
+                await api(
+                    '/prospects/' +
+                        id +
+                        '/convert',
+                    {
+                        method: 'POST'
+                    }
+                );
+
+                load();
+            }
+
+            load().catch(
+                (e) =>
+                    (dash.textContent =
+                        e.message)
+            );
+        </script>
+    </body>
+</html>

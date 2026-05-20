@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="fr">
+<head>
+    <meta charset="utf-8">
+
+    <title>Connexion</title>
+
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+
+<body>
+    <main class="container">
+        <h1>Connexion</h1>
+
+        <form id="f">
+
+            <input
+                name="email"
+                type="email"
+                placeholder="Email"
+                required
+            >
+
+            <input
+                name="password"
+                type="password"
+                placeholder="Mot de passe"
+                required
+            >
+
+            <button type="submit">
+                Se connecter
+            </button>
+
+        </form>
+
+        <p>
+            <a href="#" onclick="forgot()">
+                Mot de passe oublié
+            </a>
+        </p>
+
+        <p id="msg"></p>
+    </main>
+
+    <script src="/js/api.js"></script>
+
+    <script>
+        f.onsubmit = async (e) => {
+            e.preventDefault();
+
+            try {
+                const data = await api('/auth/login', {
+                    method: 'POST',
+                    body: JSON.stringify(
+                        Object.fromEntries(new FormData(f))
+                    )
+                });
+
+                localStorage.setItem('token', data.token);
+
+                location.href = '/pages/dashboard-admin.html';
+
+            } catch (err) {
+                msg.textContent = err.message;
+            }
+        };
+
+        async function forgot() {
+            const email = prompt('Email ?');
+
+            if (email) {
+                await api('/auth/forgot-password', {
+                    method: 'POST',
+                    body: JSON.stringify({ email })
+                });
+            }
+        }
+    </script>
+</body>
+</html>

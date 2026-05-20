@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="fr">
+    <head>
+        <meta charset="utf-8" />
+
+        <title>Évènements</title>
+
+        <link
+            rel="stylesheet"
+            href="/css/style.css"
+        />
+    </head>
+
+    <body>
+        <main class="container">
+            <h1>Évènements publics</h1>
+
+            <div class="grid">
+                <input
+                    id="type"
+                    placeholder="Type"
+                />
+
+                <input
+                    id="theme"
+                    placeholder="Thème"
+                />
+
+                <button onclick="load()">
+                    Filtrer
+                </button>
+            </div>
+
+            <section id="list"></section>
+        </main>
+
+        <script src="/js/api.js"></script>
+
+        <script>
+            async function load() {
+                const q =
+                    new URLSearchParams({
+                        type: type.value,
+                        theme: theme.value
+                    });
+
+                const rows = await api(
+                    '/events?' + q
+                );
+
+                list.innerHTML =
+                    rows
+                        .map(
+                            (e) => `
+                        <article class="card">
+                            <h2>${e.name}</h2>
+
+                            <img
+                                src="${
+                                    e.image_url ||
+                                    '/assets/event.jpg'
+                                }"
+                                alt="Image événement"
+                                width="220"
+                            />
+
+                            <p>
+                                ${e.location}
+                                -
+                                ${e.type}
+                                -
+                                ${e.theme || ''}
+                            </p>
+
+                            <a href="/pages/quote-request.html">
+                                Prestations et Devis
+                            </a>
+                        </article>
+                    `
+                        )
+                        .join('') ||
+                    'Aucun événement';
+            }
+
+            load();
+        </script>
+    </body>
+</html>
