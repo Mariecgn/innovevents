@@ -58,7 +58,7 @@
         <section class="dash-section" aria-labelledby="prospects-title">
             <div class="section-head">
                 <h2 id="prospects-title">Prospects</h2>
-                <p class="muted">Demandes de devis reçues depuis le site. Convertissez un prospect pour créer sa fiche client.</p>
+                <p class="muted">Demandes de devis reçues depuis le site. Convertissez un prospect pour créer sa fiche client, ou refusez-le s'il ne donne pas suite.</p>
             </div>
 
             <div class="toolbar">
@@ -86,7 +86,29 @@
 
         <div class="dialog__actions">
             <button type="button" class="btn btn-outline" id="convert-cancel">Annuler</button>
+            <button type="button" class="btn btn-danger-outline" id="convert-reject" hidden>Refuser ce prospect</button>
             <button type="button" class="btn" id="convert-confirm">Confirmer la conversion</button>
+        </div>
+    </dialog>
+
+    <dialog id="reject-dialog" aria-labelledby="reject-title" aria-describedby="reject-desc">
+        <div class="dialog__body">
+            <h2 id="reject-title">Refuser ce prospect ?</h2>
+            <p id="reject-desc">
+                La demande de <strong id="reject-company"></strong>
+                (<span id="reject-contact"></span>) passera au statut « Refusé »
+                et ne sera plus à traiter.
+            </p>
+            <p id="reject-duplicate" hidden>
+                Cette demande est un doublon : un client avec la même adresse e-mail existe déjà.
+            </p>
+            <p class="hint">Aucun e-mail n'est envoyé au demandeur. Cette action ne peut pas être annulée depuis l'interface.</p>
+            <div id="reject-error" role="alert"></div>
+        </div>
+
+        <div class="dialog__actions">
+            <button type="button" class="btn btn-outline" id="reject-cancel">Annuler</button>
+            <button type="button" class="btn btn-danger" id="reject-confirm">Confirmer le refus</button>
         </div>
     </dialog>
 

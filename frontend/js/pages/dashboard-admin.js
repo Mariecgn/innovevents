@@ -7,7 +7,8 @@
     const FILTERS = [
         { key: 'all', label: 'Tous', match: () => true },
         { key: 'todo', label: 'À traiter', match: (p) => p.status === 'A_CONTACTER' || p.status === 'QUALIFIE' },
-        { key: 'done', label: 'Convertis', match: (p) => p.status === 'CONVERTI' }
+        { key: 'done', label: 'Convertis', match: (p) => p.status === 'CONVERTI' },
+        { key: 'refused', label: 'Refusés', match: (p) => p.status === 'ECHOUE' }
     ];
 
     const state = {
@@ -16,11 +17,14 @@
         filter: 'all',
         pending: null,
         converting: false,
-        highlightId: null,
+        pendingReject: null,
+        rejecting: false,
+        highlight: null,
         loaded: false
     };
 
     const dialog = $('convert-dialog');
+    const rejectDialog = $('reject-dialog');
 
     /* ---------- En-tête ---------- */
 
@@ -115,6 +119,7 @@
 
     function prospectCard(p) {
         const done = p.status === 'CONVERTI';
+        const refused = p.status === 'ECHOUE';
         const phone = String(p.phone || '');
         const tel = phone.replace(/[^\d+]/g, '');
 
@@ -144,7 +149,12 @@
             <div class="prospect-card__foot">
                 ${done
                     ? `<p class="done-note">${icon('check', 18)} Converti en client</p>`
-                    : `<button type="button" class="btn" data-convert="${escapeHtml(p.id)}">Convertir en client</button>`}
+                    : refused
+                        ? `<p class="refused-note">${icon('xcircle', 18)} Prospect refusé</p>`
+                        : `<div class="prospect-card__actions">
+                            <button type="button" class="btn" data-convert="${escapeHtml(p.id)}">Convertir en client</button>
+                            <button type="button" class="btn btn-danger-outline" data-reject="${escapeHtml(p.id)}">Refuser</button>
+                        </div>`}
                 <p class="hint">Reçu le ${escapeHtml(formatDate(p.created_at))}</p>
             </div>
         </article>`;
@@ -191,12 +201,13 @@
             ? `<div class="prospect-grid">${shown.map(prospectCard).join('')}</div>`
             : emptyState('Aucun prospect dans cette catégorie', 'Changez de filtre pour afficher les autres prospects.');
 
-        if (state.highlightId !== null) {
-            const card = host.querySelector(`.prospect-card[data-id="${CSS.escape(String(state.highlightId))}"]`);
-            state.highlightId = null;
+        if (state.highlight) {
+            const { id, kind } = state.highlight;
+            const card = host.querySelector(`.prospect-card[data-id="${CSS.escape(String(id))}"]`);
+            state.highlight = null;
 
             if (card) {
-                card.classList.add('is-new');
+                card.classList.add(kind === 'refused' ? 'is-refused' : 'is-new');
                 card.focus({ preventScroll: true });
                 card.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
             }
@@ -285,6 +296,7 @@
     function resetDialog() {
         $('convert-error').innerHTML = '';
         $('convert-confirm').hidden = false;
+        $('convert-reject').hidden = true;
         $('convert-cancel').disabled = false;
         $('convert-cancel').textContent = 'Annuler';
         setBusy($('convert-confirm'), false);
@@ -308,10 +320,10 @@
     }
 
     function openConversion(id) {
-        if (state.converting) return;
+        if (state.converting || state.rejecting) return;
 
         const prospect = (state.prospects || []).find((p) => String(p.id) === String(id));
-        if (!prospect || prospect.status === 'CONVERTI') return;
+        if (!prospect || prospect.status === 'CONVERTI' || prospect.status === 'ECHOUE') return;
 
         state.pending = prospect;
         $('convert-company').textContent = prospect.company_name;
@@ -348,7 +360,7 @@
             toast('success', `« ${prospect.company_name} » a été converti en client${reference}.`);
 
             state.pending = null;
-            state.highlightId = prospect.id;
+            state.highlight = { id: prospect.id, kind: 'converted' };
             await refresh();
         } catch (err) {
             if (err.redirected) return;
@@ -358,12 +370,14 @@
             $('convert-cancel').disabled = false;
 
             const message = conversionMessage(err);
+            const duplicate = err.status === 400 && /d[ée]j[àa] existant/i.test(err.message);
 
             if (dialog.open) {
                 setMessage($('convert-error'), 'error', message);
 
                 if (err.status >= 400 && err.status < 500) {
                     confirmButton.hidden = true;
+                    $('convert-reject').hidden = !duplicate;
                     $('convert-cancel').textContent = 'Fermer';
                     refresh();
                 } else {
@@ -377,11 +391,116 @@
         }
     }
 
+    /* ---------- Refus d'un prospect ---------- */
+
+    function resetRejectDialog() {
+        $('reject-error').innerHTML = '';
+        $('reject-confirm').hidden = false;
+        $('reject-cancel').disabled = false;
+        $('reject-cancel').textContent = 'Annuler';
+        setBusy($('reject-confirm'), false);
+    }
+
+    function closeRejectDialog() {
+        if (rejectDialog.open) rejectDialog.close();
+    }
+
+    function rejectionMessage(err) {
+        if (err.status === 400) {
+            return 'Ce prospect a déjà été converti en client : il ne peut plus être refusé.';
+        }
+        if (err.status === 404 && err.message === 'Prospect introuvable') {
+            return 'Ce prospect est introuvable (il a peut-être été supprimé). La liste a été actualisée.';
+        }
+        if (err.status === 404) {
+            return "Cette action n'est pas disponible sur le serveur actuel : redémarrez le backend pour l'activer.";
+        }
+        if (err.status === 403) {
+            return 'Accès refusé : seul un administrateur peut refuser un prospect.';
+        }
+        return err.message;
+    }
+
+    function openRejection(id, { duplicate = false } = {}) {
+        if (state.converting || state.rejecting) return;
+
+        const prospect = (state.prospects || []).find((p) => String(p.id) === String(id));
+        if (!prospect || prospect.status === 'CONVERTI' || prospect.status === 'ECHOUE') return;
+
+        state.pendingReject = prospect;
+        $('reject-company').textContent = prospect.company_name;
+        $('reject-contact').textContent = `${prospect.firstname} ${prospect.lastname}`;
+        $('reject-duplicate').hidden = !duplicate;
+        resetRejectDialog();
+
+        if (typeof rejectDialog.showModal === 'function') {
+            rejectDialog.showModal();
+        } else if (window.confirm(`Refuser « ${prospect.company_name} » ?`)) {
+            runRejection();
+        }
+    }
+
+    async function runRejection() {
+        const prospect = state.pendingReject;
+        if (!prospect || state.rejecting) return;
+
+        state.rejecting = true;
+
+        const confirmButton = $('reject-confirm');
+        const cardButton = document.querySelector(`[data-reject="${CSS.escape(String(prospect.id))}"]`);
+
+        $('reject-error').innerHTML = '';
+        $('reject-cancel').disabled = true;
+        setBusy(confirmButton, true, 'Refus en cours…');
+        setBusy(cardButton, true, 'Refus en cours…');
+
+        try {
+            await api(`/prospects/${encodeURIComponent(prospect.id)}/reject`, { method: 'POST' });
+
+            closeRejectDialog();
+            toast('success', `« ${prospect.company_name} » a été refusé : il ne figure plus dans les prospects à traiter.`);
+
+            state.pendingReject = null;
+            state.highlight = { id: prospect.id, kind: 'refused' };
+            await refresh();
+        } catch (err) {
+            if (err.redirected) return;
+
+            setBusy(confirmButton, false);
+            setBusy(cardButton, false);
+            $('reject-cancel').disabled = false;
+
+            const message = rejectionMessage(err);
+
+            if (rejectDialog.open) {
+                setMessage($('reject-error'), 'error', message);
+
+                if (err.status >= 400 && err.status < 500) {
+                    confirmButton.hidden = true;
+                    $('reject-cancel').textContent = 'Fermer';
+                    refresh();
+                } else {
+                    confirmButton.textContent = 'Réessayer';
+                }
+            } else {
+                toast('error', message);
+            }
+        } finally {
+            state.rejecting = false;
+        }
+    }
+
     /* ---------- Événements de la page ---------- */
 
     $('prospects').addEventListener('click', (e) => {
-        const button = e.target.closest('[data-convert]');
-        if (button) openConversion(button.dataset.convert);
+        const convertButton = e.target.closest('[data-convert]');
+        if (convertButton) {
+            openConversion(convertButton.dataset.convert);
+            return;
+        }
+
+        const rejectButton = e.target.closest('[data-reject]');
+        if (rejectButton) openRejection(rejectButton.dataset.reject);
     });
 
     $('prospect-filters').addEventListener('click', (e) => {
@@ -402,12 +521,29 @@
     $('convert-confirm').addEventListener('click', runConversion);
     $('convert-cancel').addEventListener('click', closeDialog);
 
+    $('convert-reject').addEventListener('click', () => {
+        const prospect = state.pending;
+        closeDialog();
+        if (prospect) openRejection(prospect.id, { duplicate: true });
+    });
+
+    $('reject-confirm').addEventListener('click', runRejection);
+    $('reject-cancel').addEventListener('click', closeRejectDialog);
+
     dialog.addEventListener('cancel', (e) => {
         if (state.converting) e.preventDefault();
     });
 
     dialog.addEventListener('click', (e) => {
         if (e.target === dialog && !state.converting) closeDialog();
+    });
+
+    rejectDialog.addEventListener('cancel', (e) => {
+        if (state.rejecting) e.preventDefault();
+    });
+
+    rejectDialog.addEventListener('click', (e) => {
+        if (e.target === rejectDialog && !state.rejecting) closeRejectDialog();
     });
 
     /* ---------- Démarrage ---------- */

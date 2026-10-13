@@ -2,6 +2,7 @@ const express = require('express');
 
 const pool = require('../config/db');
 const { sendMail } = require('../services/mailService');
+const { addLog } = require('../services/logService');
 const { auth, allow } = require('../middleware/auth');
 
 const router = express.Router();
@@ -155,6 +156,70 @@ router.post(
         res.json({
             client_id: client.insertId
         });
+    }
+);
+
+// Refus d'un prospect : le statut "ECHOUE" existe déjà dans le schéma
+// (affiché « Refusé » par le frontend). Aucun e-mail n'est envoyé.
+router.post(
+    '/:id/reject',
+    auth,
+    allow('ADMIN'),
+    async (req, res) => {
+        try {
+            const id = Number(req.params.id);
+
+            if (!Number.isInteger(id) || id < 1) {
+                return res.status(404).json({
+                    message: 'Prospect introuvable'
+                });
+            }
+
+            const [[prospect]] = await pool.query(
+                `
+                SELECT id, company_name, status
+                FROM prospects
+                WHERE id = ?
+                `,
+                [id]
+            );
+
+            if (!prospect) {
+                return res.status(404).json({
+                    message: 'Prospect introuvable'
+                });
+            }
+
+            if (prospect.status === 'CONVERTI') {
+                return res.status(400).json({
+                    message: 'Prospect déjà converti en client'
+                });
+            }
+
+            await pool.query(
+                `
+                UPDATE prospects
+                SET status = "ECHOUE"
+                WHERE id = ?
+                `,
+                [prospect.id]
+            );
+
+            await addLog('REFUS_PROSPECT', req.user.id, {
+                id: prospect.id,
+                entreprise: prospect.company_name
+            });
+
+            return res.json({
+                status: 'ECHOUE'
+            });
+        } catch (error) {
+            console.error('Erreur refus prospect :', error);
+
+            return res.status(500).json({
+                message: 'Erreur lors du refus du prospect.'
+            });
+        }
     }
 );
 
