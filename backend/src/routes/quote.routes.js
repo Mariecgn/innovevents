@@ -1,5 +1,6 @@
 const express = require('express');
 const fs = require('fs');
+const jwt = require('jsonwebtoken');
 
 const pool = require('../config/db');
 const { auth, allow } = require('../middleware/auth');
@@ -119,6 +120,48 @@ async function loadQuote(id) {
     );
 
     return row || null;
+}
+
+// Un client ne lit que ses propres devis, et jamais un brouillon.
+async function canReadPdf(user, row) {
+    if (user.role !== 'CLIENT') return true;
+
+    const ids = await clientIdsFor(user);
+
+    return ids.includes(row.client_id) && row.status !== 'BROUILLON';
+}
+
+// Lien de téléchargement à durée de vie courte, pour l'application mobile : le téléphone ouvre le PDF
+// dans son navigateur, qui ne peut pas envoyer l'en-tête Authorization. Le lien est signé avec une clé
+// dérivée (il ne peut donc pas servir de jeton de session) et ne vaut que pour un seul devis.
+const PDF_LINK_TTL = '2m';
+
+function pdfLinkKey() {
+    return `${process.env.JWT_SECRET || 'change-me'}|pdf-link`;
+}
+
+function pdfAccess(req, res, next) {
+    const link = typeof req.query.token === 'string' ? req.query.token : '';
+
+    if (!link || req.headers.authorization) {
+        return auth(req, res, next);
+    }
+
+    try {
+        const claims = jwt.verify(link, pdfLinkKey());
+
+        if (claims.typ !== 'quote-pdf' || String(claims.quote) !== String(req.params.id)) {
+            throw new Error('Lien non valable pour ce devis');
+        }
+
+        req.user = { id: claims.id, email: claims.email, role: claims.role };
+
+        return next();
+    } catch (error) {
+        return res.status(401).json({
+            message: 'Lien expiré ou invalide'
+        });
+    }
 }
 
 async function buildPdf(row) {
@@ -382,27 +425,17 @@ router.post(
 
 router.get(
     '/:id/pdf',
-    auth,
+    pdfAccess,
     allow('ADMIN', 'EMPLOYEE', 'CLIENT'),
     async (req, res) => {
         try {
             const id = parseId(req.params.id);
             const row = id ? await loadQuote(id) : null;
 
-            if (!row) {
+            if (!row || !(await canReadPdf(req.user, row))) {
                 return res.status(404).json({
                     message: 'Devis introuvable'
                 });
-            }
-
-            if (req.user.role === 'CLIENT') {
-                const ids = await clientIdsFor(req.user);
-
-                if (!ids.includes(row.client_id) || row.status === 'BROUILLON') {
-                    return res.status(404).json({
-                        message: 'Devis introuvable'
-                    });
-                }
             }
 
             let file = pdfPath(id);
@@ -423,6 +456,42 @@ router.get(
             });
         } catch (error) {
             serverError(res, error, 'Erreur lors de la lecture du PDF.');
+        }
+    }
+);
+
+router.post(
+    '/:id/pdf-link',
+    auth,
+    allow('ADMIN', 'EMPLOYEE', 'CLIENT'),
+    async (req, res) => {
+        try {
+            const id = parseId(req.params.id);
+            const row = id ? await loadQuote(id) : null;
+
+            if (!row || !(await canReadPdf(req.user, row))) {
+                return res.status(404).json({
+                    message: 'Devis introuvable'
+                });
+            }
+
+            const token = jwt.sign(
+                {
+                    typ: 'quote-pdf',
+                    quote: id,
+                    id: req.user.id,
+                    email: req.user.email,
+                    role: req.user.role
+                },
+                pdfLinkKey(),
+                { expiresIn: PDF_LINK_TTL }
+            );
+
+            res.json({
+                path: `/api/quotes/${id}/pdf?token=${token}`
+            });
+        } catch (error) {
+            serverError(res, error, 'Erreur lors de la préparation du lien PDF.');
         }
     }
 );

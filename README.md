@@ -140,23 +140,38 @@ POST /api/auth/login
 JWT utilisé pour sécuriser les routes administrateur.
 
 # Mobile React Native
+L’application mobile reprend le site web : mêmes couleurs (charte graphique), mêmes pages, mêmes fonctionnalités, et la même API Express.
+
+- pages publiques : accueil, événements (filtres), avis, contact, demande de devis, mentions légales, CGU / CGV ;
+- compte : inscription et connexion (JWT, conservé en mémoire uniquement) ;
+- espace administrateur : prospects (conversion en client, refus), clients, devis (création, PDF, envoi), messages reçus ;
+- espace employé : événements et clients ;
+- espace client : messagerie et devis (PDF, acceptation, demande de modification, refus).
+
 ## Installation
 ```
 cd mobile
 npm install
 ```
-## Lancement Expo
+## Lancement dans le navigateur
 ```
 npx expo start --web --clear
 ```
 Application disponible sur :
 > http://localhost:8081
 
-Le mobile consomme l’API Express :
+## Lancement sur téléphone (Expo Go)
+```
+npx expo start
+```
+Scanner le QR code avec Expo Go (SDK 54). Le PC et le téléphone doivent être sur le même Wi-Fi, et le backend doit tourner sur le port 3000 du PC.
 
-- récupération des événements,
-- affichage des détails,
-- accès rapide téléphone/email/maps.
+L’adresse de l’API est déduite de celle du serveur Expo. Pour la forcer :
+```
+$env:EXPO_PUBLIC_API_URL = "http://192.168.1.16:3000/api"
+npx expo start
+```
+Le PDF d’un devis s’ouvre dans le navigateur du téléphone grâce à un lien signé valable 2 minutes (`POST /api/quotes/:id/pdf-link`).
 
 # GitHub
 Initialisation Git : 
