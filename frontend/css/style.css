@@ -2111,6 +2111,11 @@ tr.is-new {
         font-size: 1.9rem;
     }
 
+    .btn-sm,
+    .link-btn {
+        min-height: 44px;
+    }
+
     .event-row {
         flex-wrap: wrap;
     }
