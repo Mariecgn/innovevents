@@ -1,45 +1,88 @@
 <!doctype html>
 <html lang="fr">
 <head>
-    <meta charset="utf-8" />
-    <title>Inscription</title>
-    <link rel="stylesheet" href="/css/style.css" />
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Inscription - Innov'Events</title>
+    <meta name="description" content="Créez votre compte client Innov'Events.">
+    <meta name="theme-color" content="#946b4b">
+    <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+    <link rel="stylesheet" href="/css/style.css">
 </head>
+
 <body>
-    <main class="container">
-        <h1>Cr�er un compte</h1>
-
-        <form id="registerForm" class="card">
-            <input name="firstname" placeholder="Pr�nom" required />
-            <input name="lastname" placeholder="Nom" required />
-            <input name="username" placeholder="Nom d'utilisateur" required />
-            <input name="email" type="email" placeholder="Email" required />
-            <input name="password" type="password" placeholder="Mot de passe" required />
-            <button type="submit">Cr�er mon compte</button>
-        </form>
-
-        <p id="message"></p>
-    </main>
+    <a class="skip-link" href="#contenu">Aller au contenu principal</a>
+    <header class="site-header" id="site-header"></header>
 
     <script src="/js/api.js"></script>
-    <script>
-        registerForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
+    <script src="/js/ui.js"></script>
+    <script src="/js/layout.js"></script>
 
-            const data = Object.fromEntries(new FormData(registerForm));
+    <main id="contenu" class="container container--medium" tabindex="-1">
 
-            try {
-                const res = await api('/auth/register', {
-                    method: 'POST',
-                    body: JSON.stringify(data)
-                });
+        <div class="page-head">
+            <a class="back-link" href="/">← Retour à l'accueil</a>
+            <p class="eyebrow">Espace client</p>
+            <h1>Créer un compte</h1>
+            <p class="lead">Rejoignez Innov'Events pour accéder à votre espace personnel.</p>
+        </div>
 
-                message.textContent = res.message;
-                registerForm.reset();
-            } catch (err) {
-                message.textContent = err.message;
-            }
-        });
-    </script>
+        <div class="card" id="register-card">
+            <form id="register-form" class="form-grid" novalidate>
+
+                <div class="field">
+                    <label for="firstname">Prénom <span class="req" aria-hidden="true">*</span></label>
+                    <input id="firstname" name="firstname" autocomplete="given-name" maxlength="100" required aria-describedby="firstname-error">
+                    <p class="field-error" id="firstname-error" hidden></p>
+                </div>
+
+                <div class="field">
+                    <label for="lastname">Nom <span class="req" aria-hidden="true">*</span></label>
+                    <input id="lastname" name="lastname" autocomplete="family-name" maxlength="100" required aria-describedby="lastname-error">
+                    <p class="field-error" id="lastname-error" hidden></p>
+                </div>
+
+                <div class="field">
+                    <label for="username">Nom d'utilisateur <span class="req" aria-hidden="true">*</span></label>
+                    <input id="username" name="username" autocomplete="username" maxlength="100" required aria-describedby="username-error">
+                    <p class="field-error" id="username-error" hidden></p>
+                </div>
+
+                <div class="field">
+                    <label for="email">Adresse e-mail <span class="req" aria-hidden="true">*</span></label>
+                    <input id="email" name="email" type="email" autocomplete="email" maxlength="180" required aria-describedby="email-error">
+                    <p class="field-error" id="email-error" hidden></p>
+                </div>
+
+                <div class="field field--full">
+                    <label for="password">Mot de passe <span class="req" aria-hidden="true">*</span></label>
+                    <div class="input-group">
+                        <input id="password" name="password" type="password" autocomplete="new-password" required aria-describedby="password-rules password-error">
+                        <button type="button" class="btn btn-outline" id="toggle-password" aria-controls="password">Afficher</button>
+                    </div>
+                    <p class="field-error" id="password-error" hidden></p>
+                    <ul class="rules" id="password-rules" aria-label="Règles du mot de passe">
+                        <li data-rule="length">8 caractères minimum</li>
+                        <li data-rule="lower">1 lettre minuscule</li>
+                        <li data-rule="upper">1 lettre majuscule</li>
+                        <li data-rule="digit">1 chiffre</li>
+                        <li data-rule="special">1 caractère spécial</li>
+                    </ul>
+                </div>
+
+                <div class="field--full" id="register-message" role="alert"></div>
+
+                <div class="form-actions">
+                    <button type="submit" class="btn" id="register-submit">Créer mon compte</button>
+                    <span class="hint">Déjà inscrit(e) ? <a href="/pages/login.html">Se connecter</a></span>
+                </div>
+            </form>
+        </div>
+
+    </main>
+
+    <footer class="site-footer" id="site-footer"></footer>
+
+    <script src="/js/pages/register.js"></script>
 </body>
 </html>

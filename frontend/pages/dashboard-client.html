@@ -1,27 +1,79 @@
 <!doctype html>
 <html lang="fr">
-    <head>
-        <meta charset="utf-8" />
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Espace client - Innov'Events</title>
+    <meta name="description" content="Votre espace client Innov'Events.">
+    <meta name="robots" content="noindex">
+    <meta name="theme-color" content="#946b4b">
+    <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+    <link rel="stylesheet" href="/css/style.css">
+</head>
 
-        <title>Dashboard Client</title>
+<body>
+    <a class="skip-link" href="#contenu">Aller au contenu principal</a>
+    <header class="site-header" id="site-header"></header>
 
-        <link
-            rel="stylesheet"
-            href="/css/style.css"
-        />
-    </head>
+    <script src="/js/api.js"></script>
+    <script src="/js/ui.js"></script>
+    <script src="/js/layout.js"></script>
 
-    <body>
-        <main class="container">
-            <h1>Dashboard Client</h1>
+    <main id="contenu" class="container" tabindex="-1" hidden>
 
-            <div class="card">
-                <p>
-                    Page fonctionnelle / prototype pour l'ECF
-                    Innov'Events. Les fonctionnalités principales sont
-                    exposées via l'API et la navigation.
-                </p>
+        <section class="dash-head" aria-labelledby="titre">
+            <div>
+                <p class="eyebrow">Espace client</p>
+                <div class="dash-title">
+                    <h1 id="titre">Bonjour <span id="prenom"></span> <span aria-hidden="true">👋</span></h1>
+                    <span class="badge badge--role" id="role-badge">CLIENT</span>
+                </div>
+                <p class="lead" id="date-du-jour"></p>
             </div>
-        </main>
-    </body>
+
+            <div class="dash-head__actions">
+                <a class="btn btn-outline" href="/">← Retour à l'accueil</a>
+                <button type="button" class="btn btn-outline" data-logout>Déconnexion</button>
+            </div>
+        </section>
+
+        <section class="dash-section" aria-labelledby="actions-title">
+            <div class="section-head">
+                <h2 id="actions-title">Que souhaitez-vous faire ?</h2>
+            </div>
+
+            <div class="feature-grid">
+                <article class="card feature">
+                    <span class="icon-badge" id="icon-events"></span>
+                    <h3>Découvrir nos événements</h3>
+                    <p>Parcourez les événements publics organisés par l'agence.</p>
+                    <a class="btn btn-outline btn-sm" href="/pages/events.html">Voir les événements</a>
+                </article>
+
+                <article class="card feature">
+                    <span class="icon-badge" id="icon-quote"></span>
+                    <h3>Un nouveau projet ?</h3>
+                    <p>Décrivez votre besoin, l'agence vous recontacte dans les plus brefs délais.</p>
+                    <a class="btn btn-sm" href="/pages/quote-request.html">Demander un devis</a>
+                </article>
+
+                <article class="card feature">
+                    <span class="icon-badge" id="icon-contact"></span>
+                    <h3>Une question ?</h3>
+                    <p>Contactez directement l'équipe Innov'Events.</p>
+                    <a class="btn btn-outline btn-sm" href="/pages/contact.html">Nous contacter</a>
+                </article>
+            </div>
+        </section>
+
+        <section class="dash-section">
+            <div id="client-notice"></div>
+        </section>
+
+    </main>
+
+    <footer class="site-footer" id="site-footer"></footer>
+
+    <script src="/js/pages/dashboard-client.js"></script>
+</body>
 </html>

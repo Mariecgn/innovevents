@@ -2,89 +2,144 @@
 <html lang="fr">
 <head>
     <meta charset="utf-8">
-
-    <meta 
-        name="viewport" 
-        content="width=device-width, initial-scale=1"
-    >
-
-    <title>Innov'Events</title>
-
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Innov'Events - Agence événementielle haut de gamme</title>
+    <meta name="description" content="Innov'Events, agence événementielle haut de gamme spécialisée dans les séminaires, conférences et soirées professionnelles sur mesure.">
+    <meta name="theme-color" content="#946b4b">
+    <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
     <link rel="stylesheet" href="/css/style.css">
 </head>
 
 <body>
+    <a class="skip-link" href="#contenu">Aller au contenu principal</a>
+    <header class="site-header" id="site-header"></header>
 
-    <header>
-        <nav>
-            <a href="/">Accueil</a>
+    <script src="/js/api.js"></script>
+    <script src="/js/ui.js"></script>
+    <script src="/js/layout.js"></script>
 
-            <a href="/pages/login.html">
-                Connexion
-            </a>
+    <main id="contenu" tabindex="-1">
 
-            <a href="/pages/register.html">
-                Inscription
-            </a>
+        <section class="hero" aria-labelledby="hero-title">
+            <div>
+                <p class="eyebrow">Événements d'entreprise sur mesure</p>
+                <h1 id="hero-title">Innov'Events Manager</h1>
 
-            <a href="/pages/events.html">
-                Évènements
-            </a>
+                <p class="lead">
+                    Agence événementielle haut de gamme spécialisée
+                    dans les séminaires, conférences et soirées
+                    professionnelles sur mesure.
+                </p>
 
-            <a href="/pages/reviews.html">
-                Avis
-            </a>
+                <div class="hero__actions">
+                    <a class="btn" href="/pages/quote-request.html">Demander un devis</a>
+                    <a class="btn btn-outline" href="/pages/events.html">Découvrir nos événements</a>
+                </div>
 
-            <a href="/pages/contact.html">
-                Contact
-            </a>
+                <ul class="chip-list" aria-label="Nos formats d'événements">
+                    <li>Séminaires</li>
+                    <li>Conférences</li>
+                    <li>Soirées d'entreprise</li>
+                </ul>
+            </div>
 
-            <a 
-                class="cta" 
-                href="/pages/quote-request.html"
-            >
-                Demande de devis
-            </a>
-        </nav>
-    </header>
-
-    <main class="hero">
-
-        <section>
-            <h1>Innov'Events Manager</h1>
-
-            <p>
-                Agence événementielle haut de gamme spécialisée 
-                dans les séminaires, conférences et soirées 
-                professionnelles sur mesure.
-            </p>
-
-            <a 
-                class="button" 
-                href="/pages/quote-request.html"
-            >
-                Demander un devis
-            </a>
+            <div class="hero__visual">
+                <img src="/assets/hero.svg" alt="" width="800" height="640">
+            </div>
         </section>
 
-        <img 
-            src="/assets/event.jpg" 
-            alt="Salle de conférence moderne"
-        >
+        <section class="section section--alt" aria-labelledby="services-title">
+            <div class="section__inner">
+                <div class="section-head">
+                    <p class="eyebrow">Nos prestations</p>
+                    <h2 id="services-title">Un événement à l'image de votre entreprise</h2>
+                </div>
+
+                <div class="feature-grid">
+                    <article class="card feature">
+                        <span class="icon-badge">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
+                        </span>
+                        <h3>Séminaires</h3>
+                        <p>Réunissez vos équipes autour d'un programme pensé pour vos objectifs.</p>
+                        <a class="btn btn-outline btn-sm" href="/pages/quote-request.html?event_type=S%C3%A9minaire">Demander un devis</a>
+                    </article>
+
+                    <article class="card feature">
+                        <span class="icon-badge">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M2 3h20"/><path d="M21 3v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V3"/><path d="m7 21 5-5 5 5"/></svg>
+                        </span>
+                        <h3>Conférences</h3>
+                        <p>Des conférences professionnelles pour partager, inspirer et fédérer.</p>
+                        <a class="btn btn-outline btn-sm" href="/pages/quote-request.html?event_type=Conf%C3%A9rence">Demander un devis</a>
+                    </article>
+
+                    <article class="card feature">
+                        <span class="icon-badge">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                        </span>
+                        <h3>Soirées d'entreprise</h3>
+                        <p>Des soirées professionnelles sur mesure, à l'image de votre entreprise.</p>
+                        <a class="btn btn-outline btn-sm" href="/pages/quote-request.html?event_type=Soir%C3%A9e%20d%27entreprise">Demander un devis</a>
+                    </article>
+                </div>
+            </div>
+        </section>
+
+        <section class="section" aria-labelledby="steps-title">
+            <div class="section__inner">
+                <div class="section-head">
+                    <p class="eyebrow">Comment ça se passe</p>
+                    <h2 id="steps-title">De votre demande à votre événement</h2>
+                </div>
+
+                <ol class="steps">
+                    <li class="step">
+                        <h3>Vous nous écrivez</h3>
+                        <p>Décrivez votre projet via le formulaire de demande de devis : type d'événement, date, lieu et nombre de participants.</p>
+                    </li>
+                    <li class="step">
+                        <h3>Nous échangeons</h3>
+                        <p>Chloé vous recontacte dans les plus brefs délais pour discuter de votre projet.</p>
+                    </li>
+                    <li class="step">
+                        <h3>Nous préparons votre événement</h3>
+                        <p>Une fois votre projet validé, nous organisons votre événement sur mesure.</p>
+                    </li>
+                </ol>
+            </div>
+        </section>
+
+        <section class="section section--alt" id="home-events" aria-labelledby="home-events-title" hidden>
+            <div class="section__inner">
+                <div class="section-head section-head--row">
+                    <div>
+                        <p class="eyebrow">À venir</p>
+                        <h2 id="home-events-title">Prochains événements</h2>
+                    </div>
+                    <a class="btn btn-outline btn-sm" href="/pages/events.html">Voir tous les événements</a>
+                </div>
+
+                <div class="events-grid" id="home-events-list"></div>
+            </div>
+        </section>
+
+        <section class="section" aria-labelledby="cta-title">
+            <div class="section__inner">
+                <div class="cta-band">
+                    <div>
+                        <h2 id="cta-title">Un projet d'événement ?</h2>
+                        <p>Parlons-en : décrivez-nous votre besoin, nous vous recontactons dans les plus brefs délais.</p>
+                    </div>
+                    <a class="btn btn-light" href="/pages/quote-request.html">Demander un devis</a>
+                </div>
+            </div>
+        </section>
 
     </main>
 
-    <footer>
-        <a href="/pages/legal.html">
-            Mentions légales
-        </a>
+    <footer class="site-footer" id="site-footer"></footer>
 
-        ·
-
-        <a href="/pages/cgu-cgv.html">
-            CGU / CGV
-        </a>
-    </footer>
-
+    <script src="/js/pages/home.js"></script>
 </body>
 </html>

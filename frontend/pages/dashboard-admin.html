@@ -1,99 +1,97 @@
 <!doctype html>
 <html lang="fr">
-    <head>
-        <meta charset="utf-8" />
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Tableau de bord administrateur - Innov'Events</title>
+    <meta name="description" content="Espace administrateur Innov'Events : statistiques, prospects et conversion en clients.">
+    <meta name="robots" content="noindex">
+    <meta name="theme-color" content="#946b4b">
+    <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+    <link rel="stylesheet" href="/css/style.css">
+</head>
 
-        <title>Dashboard admin</title>
+<body>
+    <a class="skip-link" href="#contenu">Aller au contenu principal</a>
+    <header class="site-header" id="site-header"></header>
 
-        <link
-            rel="stylesheet"
-            href="/css/style.css"
-        />
-    </head>
+    <script src="/js/api.js"></script>
+    <script src="/js/ui.js"></script>
+    <script src="/js/layout.js"></script>
 
-    <body>
-        <main class="container">
-            <h1>
-                Tableau de bord administrateur
-            </h1>
+    <main id="contenu" class="container" tabindex="-1" hidden>
 
-            <section
-                id="dash"
-                class="grid"
-            ></section>
+        <section class="dash-head" aria-labelledby="titre">
+            <div>
+                <p class="eyebrow">Espace administrateur</p>
+                <div class="dash-title">
+                    <h1 id="titre">Bonjour <span id="prenom"></span> <span aria-hidden="true">👋</span></h1>
+                    <span class="badge badge--role" id="role-badge" hidden>ADMIN</span>
+                </div>
+                <p class="lead" id="date-du-jour"></p>
+            </div>
 
-            <h2>Prospects</h2>
+            <div class="dash-head__actions">
+                <a class="btn btn-outline" href="/">← Retour à l'accueil</a>
+                <button type="button" class="btn btn-outline" data-logout>Déconnexion</button>
+            </div>
+        </section>
 
-            <section id="prospects"></section>
-        </main>
+        <section class="dash-section" aria-labelledby="stats-title">
+            <div class="section-head section-head--row">
+                <h2 id="stats-title">Vue d'ensemble</h2>
+                <button type="button" class="btn btn-outline btn-sm" id="refresh">Actualiser</button>
+            </div>
 
-        <script src="/js/api.js"></script>
+            <div id="stats-error" class="notice-slot"></div>
+            <div class="stats-grid" id="stats" aria-busy="true"></div>
+        </section>
 
-        <script>
-            async function load() {
-                const d = await api(
-                    '/dashboard/admin'
-                );
+        <section class="dash-section" aria-labelledby="events-title">
+            <div class="section-head">
+                <h2 id="events-title">Prochains événements</h2>
+            </div>
 
-                dash.innerHTML = `
-                    <div class="card">
-                        Clients actifs :
-                        ${d.stats.clients_actifs}
-                    </div>
+            <div id="events-list"></div>
+        </section>
 
-                    <div class="card">
-                        Événements brouillon :
-                        ${d.stats.events_brouillon}
-                    </div>
+        <section class="dash-section" aria-labelledby="prospects-title">
+            <div class="section-head">
+                <h2 id="prospects-title">Prospects</h2>
+                <p class="muted">Demandes de devis reçues depuis le site. Convertissez un prospect pour créer sa fiche client.</p>
+            </div>
 
-                    <div class="card">
-                        Prochains événements :
-                        ${d.events.length}
-                    </div>
-                `;
+            <div class="toolbar">
+                <div class="chips" id="prospect-filters" role="group" aria-label="Filtrer les prospects"></div>
+                <span class="muted" id="prospect-count" role="status"></span>
+            </div>
 
-                const p = await api(
-                    '/prospects'
-                );
+            <div id="prospects-error" class="notice-slot"></div>
+            <div id="prospects" aria-busy="true"></div>
+        </section>
 
-                prospects.innerHTML = p
-                    .map(
-                        (x) => `
-                        <div class="card">
-                            ${x.company_name}
-                            -
-                            ${x.firstname}
-                            ${x.lastname}
+    </main>
 
-                            <button
-                                onclick="convert(${x.id})"
-                            >
-                                Convertir en client
-                            </button>
-                        </div>
-                    `
-                    )
-                    .join('');
-            }
+    <dialog id="convert-dialog" aria-labelledby="convert-title" aria-describedby="convert-desc">
+        <div class="dialog__body">
+            <h2 id="convert-title">Convertir ce prospect en client ?</h2>
+            <p id="convert-desc">
+                Une fiche client sera créée pour <strong id="convert-company"></strong>
+                (<span id="convert-contact"></span>) à partir des informations du prospect.
+                Le prospect passera au statut « Converti ».
+            </p>
+            <p class="hint">Cette action ne peut pas être annulée depuis l'interface.</p>
+            <div id="convert-error" role="alert"></div>
+        </div>
 
-            async function convert(id) {
-                await api(
-                    '/prospects/' +
-                        id +
-                        '/convert',
-                    {
-                        method: 'POST'
-                    }
-                );
+        <div class="dialog__actions">
+            <button type="button" class="btn btn-outline" id="convert-cancel">Annuler</button>
+            <button type="button" class="btn" id="convert-confirm">Confirmer la conversion</button>
+        </div>
+    </dialog>
 
-                load();
-            }
+    <footer class="site-footer" id="site-footer"></footer>
 
-            load().catch(
-                (e) =>
-                    (dash.textContent =
-                        e.message)
-            );
-        </script>
-    </body>
+    <script src="/js/pages/dashboard-admin.js"></script>
+</body>
 </html>

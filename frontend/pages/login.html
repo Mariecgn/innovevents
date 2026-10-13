@@ -2,80 +2,90 @@
 <html lang="fr">
 <head>
     <meta charset="utf-8">
-
-    <title>Connexion</title>
-
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Connexion - Innov'Events</title>
+    <meta name="description" content="Connectez-vous à votre espace Innov'Events.">
+    <meta name="theme-color" content="#946b4b">
+    <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
     <link rel="stylesheet" href="/css/style.css">
 </head>
 
 <body>
-    <main class="container">
-        <h1>Connexion</h1>
-
-        <form id="f">
-
-            <input
-                name="email"
-                type="email"
-                placeholder="Email"
-                required
-            >
-
-            <input
-                name="password"
-                type="password"
-                placeholder="Mot de passe"
-                required
-            >
-
-            <button type="submit">
-                Se connecter
-            </button>
-
-        </form>
-
-        <p>
-            <a href="#" onclick="forgot()">
-                Mot de passe oublié
-            </a>
-        </p>
-
-        <p id="msg"></p>
-    </main>
+    <a class="skip-link" href="#contenu">Aller au contenu principal</a>
+    <header class="site-header" id="site-header"></header>
 
     <script src="/js/api.js"></script>
+    <script src="/js/ui.js"></script>
+    <script src="/js/layout.js"></script>
 
-    <script>
-        f.onsubmit = async (e) => {
-            e.preventDefault();
+    <main id="contenu" class="container container--narrow" tabindex="-1">
 
-            try {
-                const data = await api('/auth/login', {
-                    method: 'POST',
-                    body: JSON.stringify(
-                        Object.fromEntries(new FormData(f))
-                    )
-                });
+        <div class="page-head">
+            <a class="back-link" href="/">← Retour à l'accueil</a>
+            <p class="eyebrow">Espace personnel</p>
+            <h1>Connexion</h1>
+            <p class="lead">Accédez à votre espace Innov'Events.</p>
+        </div>
 
-                localStorage.setItem('token', data.token);
+        <div id="login-notice" class="notice-slot"></div>
 
-                location.href = '/pages/dashboard-admin.html';
+        <div class="card" id="login-card">
+            <form id="login-form" novalidate>
+                <div class="field">
+                    <label for="email">Adresse e-mail</label>
+                    <input id="email" name="email" type="email" autocomplete="username" maxlength="180" required aria-describedby="email-error">
+                    <p class="field-error" id="email-error" hidden></p>
+                </div>
 
-            } catch (err) {
-                msg.textContent = err.message;
-            }
-        };
+                <div class="field">
+                    <label for="password">Mot de passe</label>
+                    <div class="input-group">
+                        <input id="password" name="password" type="password" autocomplete="current-password" required aria-describedby="password-error">
+                        <button type="button" class="btn btn-outline" id="toggle-password" aria-controls="password">Afficher</button>
+                    </div>
+                    <p class="field-error" id="password-error" hidden></p>
+                </div>
 
-        async function forgot() {
-            const email = prompt('Email ?');
+                <div id="login-message" role="alert"></div>
 
-            if (email) {
-                await api('/auth/forgot-password', {
-                    method: 'POST',
-                    body: JSON.stringify({ email })
-                });
-            }
-        }
-    </script>
+                <button type="submit" class="btn" id="login-submit">Se connecter</button>
+            </form>
+
+            <p class="hint mt-1">
+                <button type="button" class="link-btn" id="forgot-open">Mot de passe oublié ?</button>
+            </p>
+        </div>
+
+        <p class="hint mt-2" id="register-hint">
+            Pas encore de compte ? <a href="/pages/register.html">Créer un compte</a>
+        </p>
+
+    </main>
+
+    <dialog id="forgot-dialog" aria-labelledby="forgot-title">
+        <form id="forgot-form" novalidate>
+            <div class="dialog__body">
+                <h2 id="forgot-title">Mot de passe oublié</h2>
+                <p>Saisissez l'adresse e-mail de votre compte.</p>
+
+                <div class="field">
+                    <label for="forgot-email">Adresse e-mail</label>
+                    <input id="forgot-email" name="email" type="email" autocomplete="email" maxlength="180" required aria-describedby="forgot-email-error">
+                    <p class="field-error" id="forgot-email-error" hidden></p>
+                </div>
+
+                <div id="forgot-message" role="alert"></div>
+            </div>
+
+            <div class="dialog__actions">
+                <button type="button" class="btn btn-outline" id="forgot-cancel">Annuler</button>
+                <button type="submit" class="btn" id="forgot-submit">Envoyer</button>
+            </div>
+        </form>
+    </dialog>
+
+    <footer class="site-footer" id="site-footer"></footer>
+
+    <script src="/js/pages/login.js"></script>
 </body>
 </html>

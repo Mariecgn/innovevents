@@ -1,27 +1,73 @@
 <!doctype html>
 <html lang="fr">
-    <head>
-        <meta charset="utf-8" />
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Espace employé - Innov'Events</title>
+    <meta name="description" content="Espace employé Innov'Events : événements et clients.">
+    <meta name="robots" content="noindex">
+    <meta name="theme-color" content="#946b4b">
+    <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+    <link rel="stylesheet" href="/css/style.css">
+</head>
 
-        <title>Dashboard Employé</title>
+<body>
+    <a class="skip-link" href="#contenu">Aller au contenu principal</a>
+    <header class="site-header" id="site-header"></header>
 
-        <link
-            rel="stylesheet"
-            href="/css/style.css"
-        />
-    </head>
+    <script src="/js/api.js"></script>
+    <script src="/js/ui.js"></script>
+    <script src="/js/layout.js"></script>
 
-    <body>
-        <main class="container">
-            <h1>Dashboard Employé</h1>
+    <main id="contenu" class="container" tabindex="-1" hidden>
 
-            <div class="card">
-                <p>
-                    Page fonctionnelle / prototype pour l'ECF
-                    Innov'Events. Les fonctionnalités principales sont
-                    exposées via l'API et la navigation.
-                </p>
+        <section class="dash-head" aria-labelledby="titre">
+            <div>
+                <p class="eyebrow">Espace employé</p>
+                <div class="dash-title">
+                    <h1 id="titre">Bonjour <span id="prenom"></span> <span aria-hidden="true">👋</span></h1>
+                    <span class="badge badge--role" id="role-badge" hidden>EMPLOYÉ</span>
+                </div>
+                <p class="lead" id="date-du-jour"></p>
             </div>
-        </main>
-    </body>
+
+            <div class="dash-head__actions">
+                <a class="btn btn-outline" href="/">← Retour à l'accueil</a>
+                <button type="button" class="btn btn-outline" data-logout>Déconnexion</button>
+            </div>
+        </section>
+
+        <section class="dash-section" aria-labelledby="stats-title">
+            <div class="section-head section-head--row">
+                <h2 id="stats-title">Vue d'ensemble</h2>
+                <button type="button" class="btn btn-outline btn-sm" id="refresh">Actualiser</button>
+            </div>
+
+            <div class="stats-grid" id="stats" aria-busy="true"></div>
+        </section>
+
+        <section class="dash-section" aria-labelledby="events-title">
+            <div class="section-head">
+                <h2 id="events-title">Événements</h2>
+            </div>
+
+            <div id="events-error" class="notice-slot"></div>
+            <div id="events-list" aria-busy="true"></div>
+        </section>
+
+        <section class="dash-section" aria-labelledby="clients-title">
+            <div class="section-head">
+                <h2 id="clients-title">Clients</h2>
+            </div>
+
+            <div id="clients-error" class="notice-slot"></div>
+            <div id="clients-list" aria-busy="true"></div>
+        </section>
+
+    </main>
+
+    <footer class="site-footer" id="site-footer"></footer>
+
+    <script src="/js/pages/dashboard-employee.js"></script>
+</body>
 </html>

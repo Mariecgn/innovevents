@@ -1,22 +1,57 @@
 <!doctype html>
 <html lang="fr">
-    <head>
-        <meta charset="utf-8" />
-        <title>CGU - CGV</title>
-        <link rel="stylesheet" href="/css/style.css" />
-    </head>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>CGU / CGV - Innov'Events</title>
+    <meta name="description" content="Conditions générales d'utilisation et de vente d'Innov'Events.">
+    <meta name="theme-color" content="#946b4b">
+    <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+    <link rel="stylesheet" href="/css/style.css">
+</head>
 
-    <body>
-        <main class="container">
-            <h1>CGU - CGV</h1>
+<body>
+    <a class="skip-link" href="#contenu">Aller au contenu principal</a>
+    <header class="site-header" id="site-header"></header>
 
-            <div class="card">
-                <p>
-                    Page fonctionnelle / prototype pour l'ECF
-                    Innov'Events. Les fonctionnalités principales sont
-                    exposées via l'API et la navigation.
-                </p>
-            </div>
-        </main>
-    </body>
+    <script src="/js/api.js"></script>
+    <script src="/js/ui.js"></script>
+    <script src="/js/layout.js"></script>
+
+    <main id="contenu" class="container container--medium" tabindex="-1">
+
+        <div class="page-head">
+            <a class="back-link" href="/">← Retour à l'accueil</a>
+            <p class="eyebrow">Informations légales</p>
+            <h1>CGU / CGV</h1>
+        </div>
+
+        <div id="cgu-notice" class="notice-slot"></div>
+
+        <div class="card prose">
+            <h2>Conditions générales d'utilisation</h2>
+            <ul>
+                <li><strong>Accès au site :</strong> la consultation du site est libre. La création d'un compte donne accès à un espace personnel.</li>
+                <li><strong>Compte utilisateur :</strong> vous êtes responsable de la confidentialité de vos identifiants et des actions réalisées depuis votre compte.</li>
+                <li><strong>Exactitude des informations :</strong> les informations transmises dans les formulaires doivent être exactes afin que l'agence puisse vous recontacter.</li>
+            </ul>
+
+            <h2>Conditions générales de vente</h2>
+            <p>
+                Tarifs, modalités de paiement, conditions d'annulation et responsabilités :
+                <em>à compléter</em>.
+            </p>
+        </div>
+
+    </main>
+
+    <footer class="site-footer" id="site-footer"></footer>
+
+    <script>
+        document.getElementById('cgu-notice').innerHTML = alertHtml(
+            'warning',
+            'Version provisoire : ces conditions doivent être complétées et validées avant la mise en ligne du site.'
+        );
+    </script>
+</body>
 </html>

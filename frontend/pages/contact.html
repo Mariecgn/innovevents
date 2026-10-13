@@ -1,22 +1,55 @@
 <!doctype html>
 <html lang="fr">
-    <head>
-        <meta charset="utf-8" />
-        <title>Contact</title>
-        <link rel="stylesheet" href="/css/style.css" />
-    </head>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Contact - Innov'Events</title>
+    <meta name="description" content="Contactez l'agence événementielle Innov'Events.">
+    <meta name="theme-color" content="#946b4b">
+    <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+    <link rel="stylesheet" href="/css/style.css">
+</head>
 
-    <body>
-        <main class="container">
+<body>
+    <a class="skip-link" href="#contenu">Aller au contenu principal</a>
+    <header class="site-header" id="site-header"></header>
+
+    <script src="/js/api.js"></script>
+    <script src="/js/ui.js"></script>
+    <script src="/js/layout.js"></script>
+
+    <main id="contenu" class="container container--medium" tabindex="-1">
+
+        <div class="page-head">
+            <a class="back-link" href="/">← Retour à l'accueil</a>
+            <p class="eyebrow">Parlons de votre projet</p>
             <h1>Contact</h1>
+            <p class="lead">Une question, un projet d'événement ? Choisissez le moyen le plus simple pour nous joindre.</p>
+        </div>
 
-            <div class="card">
-                <p>
-                    Page fonctionnelle / prototype pour l'ECF
-                    Innov'Events. Les fonctionnalités principales sont
-                    exposées via l'API et la navigation.
-                </p>
-            </div>
-        </main>
-    </body>
+        <div class="grid">
+            <article class="card feature">
+                <span class="icon-badge" id="contact-icon-mail"></span>
+                <h2>Écrivez-nous</h2>
+                <p>Pour toute question, contactez l'agence par e-mail.</p>
+                <a class="btn btn-sm" href="mailto:contact@innovevents.com">contact@innovevents.com</a>
+            </article>
+
+            <article class="card feature">
+                <span class="icon-badge" id="contact-icon-quote"></span>
+                <h2>Parlez-nous de votre projet</h2>
+                <p>Le formulaire de demande de devis nous permet de vous recontacter avec toutes les informations utiles.</p>
+                <a class="btn btn-outline btn-sm" href="/pages/quote-request.html">Faire une demande de devis</a>
+            </article>
+        </div>
+
+    </main>
+
+    <footer class="site-footer" id="site-footer"></footer>
+
+    <script>
+        document.getElementById('contact-icon-mail').innerHTML = icon('mail', 24);
+        document.getElementById('contact-icon-quote').innerHTML = icon('edit', 24);
+    </script>
+</body>
 </html>

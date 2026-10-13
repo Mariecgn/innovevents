@@ -1,88 +1,74 @@
 <!doctype html>
 <html lang="fr">
-    <head>
-        <meta charset="utf-8" />
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Événements - Innov'Events</title>
+    <meta name="description" content="Découvrez les événements publics organisés par Innov'Events.">
+    <meta name="theme-color" content="#946b4b">
+    <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+    <link rel="stylesheet" href="/css/style.css">
+</head>
 
-        <title>Évènements</title>
+<body>
+    <a class="skip-link" href="#contenu">Aller au contenu principal</a>
+    <header class="site-header" id="site-header"></header>
 
-        <link
-            rel="stylesheet"
-            href="/css/style.css"
-        />
-    </head>
+    <script src="/js/api.js"></script>
+    <script src="/js/ui.js"></script>
+    <script src="/js/layout.js"></script>
 
-    <body>
-        <main class="container">
-            <h1>Évènements publics</h1>
+    <main id="contenu" class="container" tabindex="-1">
 
-            <div class="grid">
-                <input
-                    id="type"
-                    placeholder="Type"
-                />
+        <div class="page-head">
+            <a class="back-link" href="/">← Retour à l'accueil</a>
+            <p class="eyebrow">Nos réalisations</p>
+            <h1>Événements publics</h1>
+            <p class="lead">Parcourez les événements d'entreprise organisés par l'agence et filtrez-les par type, thème ou période.</p>
+        </div>
 
-                <input
-                    id="theme"
-                    placeholder="Thème"
-                />
-
-                <button onclick="load()">
-                    Filtrer
-                </button>
+        <form id="filters" class="card filters" novalidate>
+            <div class="field">
+                <label for="type">Type</label>
+                <input id="type" name="type" list="type-options" placeholder="Ex. Séminaire" autocomplete="off">
+                <datalist id="type-options">
+                    <option value="Séminaire"></option>
+                    <option value="Conférence"></option>
+                    <option value="Soirée d'entreprise"></option>
+                    <option value="Autre"></option>
+                </datalist>
             </div>
 
-            <section id="list"></section>
-        </main>
+            <div class="field">
+                <label for="theme">Thème</label>
+                <input id="theme" name="theme" placeholder="Ex. Leadership" autocomplete="off">
+            </div>
 
-        <script src="/js/api.js"></script>
+            <div class="field">
+                <label for="from">À partir du</label>
+                <input id="from" name="from" type="date">
+            </div>
 
-        <script>
-            async function load() {
-                const q =
-                    new URLSearchParams({
-                        type: type.value,
-                        theme: theme.value
-                    });
+            <div class="field">
+                <label for="to">Jusqu'au</label>
+                <input id="to" name="to" type="date">
+            </div>
 
-                const rows = await api(
-                    '/events?' + q
-                );
+            <div class="form-actions">
+                <button type="submit" class="btn" id="filter-submit">Filtrer</button>
+                <button type="reset" class="btn btn-outline" id="filter-reset">Réinitialiser</button>
+                <span class="muted" id="result-count" role="status"></span>
+            </div>
+        </form>
 
-                list.innerHTML =
-                    rows
-                        .map(
-                            (e) => `
-                        <article class="card">
-                            <h2>${e.name}</h2>
+        <div id="filter-message" role="alert"></div>
 
-                            <img
-                                src="${
-                                    e.image_url ||
-                                    '/assets/event.jpg'
-                                }"
-                                alt="Image événement"
-                                width="220"
-                            />
+        <section id="events" aria-busy="true" aria-label="Liste des événements"></section>
 
-                            <p>
-                                ${e.location}
-                                -
-                                ${e.type}
-                                -
-                                ${e.theme || ''}
-                            </p>
+    </main>
 
-                            <a href="/pages/quote-request.html">
-                                Prestations et Devis
-                            </a>
-                        </article>
-                    `
-                        )
-                        .join('') ||
-                    'Aucun événement';
-            }
+    <footer class="site-footer" id="site-footer"></footer>
 
-            load();
-        </script>
-    </body>
+    <script src="/js/pages/events.js"></script>
+</body>
 </html>

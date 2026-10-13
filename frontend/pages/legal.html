@@ -2,21 +2,72 @@
 <html lang="fr">
 <head>
     <meta charset="utf-8">
-    <title>legal</title>
-    
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Mentions légales - Innov'Events</title>
+    <meta name="description" content="Mentions légales du site Innov'Events.">
+    <meta name="theme-color" content="#946b4b">
+    <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
     <link rel="stylesheet" href="/css/style.css">
 </head>
 
 <body>
-    <main class="container">
-        <h1>legal</h1>
+    <a class="skip-link" href="#contenu">Aller au contenu principal</a>
+    <header class="site-header" id="site-header"></header>
 
-        <div class="card">
+    <script src="/js/api.js"></script>
+    <script src="/js/ui.js"></script>
+    <script src="/js/layout.js"></script>
+
+    <main id="contenu" class="container container--medium" tabindex="-1">
+
+        <div class="page-head">
+            <a class="back-link" href="/">← Retour à l'accueil</a>
+            <p class="eyebrow">Informations légales</p>
+            <h1>Mentions légales</h1>
+        </div>
+
+        <div id="legal-notice" class="notice-slot"></div>
+
+        <div class="card prose">
+            <h2>Éditeur du site</h2>
+            <p>Innov'Events, agence événementielle.</p>
+            <ul>
+                <li>Raison sociale et forme juridique : <em>à compléter</em></li>
+                <li>Numéro SIRET : <em>à compléter</em></li>
+                <li>Adresse du siège : <em>à compléter</em></li>
+                <li>Directeur de la publication : <em>à compléter</em></li>
+                <li>Contact : <a href="mailto:contact@innovevents.com">contact@innovevents.com</a></li>
+            </ul>
+
+            <h2>Hébergement</h2>
+            <p>Hébergeur du site : <em>à compléter</em>.</p>
+
+            <h2>Données personnelles</h2>
+            <p>Le site ne collecte que les informations que vous saisissez :</p>
+            <ul>
+                <li>via le formulaire de demande de devis : entreprise, nom, prénom, adresse e-mail, téléphone, lieu, type d'événement, date souhaitée, nombre de participants et description du besoin ;</li>
+                <li>lors de la création d'un compte : nom, prénom, nom d'utilisateur, adresse e-mail et mot de passe (conservé sous forme hachée, non lisible).</li>
+            </ul>
             <p>
-                Page fonctionnelle/prototype pour l'ECF Innov'Events.
-                Les fonctionnalités principales sont exposées via l'API et la navigation.
+                Ces données servent uniquement à répondre à vos demandes et à gérer la relation client.
+                Par mesure de sécurité, les tentatives de connexion (réussies ou non) sont journalisées, adresse IP comprise.
+                Durée de conservation : <em>à compléter</em>.
+            </p>
+            <p>
+                Conformément au RGPD, vous disposez d'un droit d'accès, de rectification et de suppression de vos données.
+                Pour l'exercer, écrivez à <a href="mailto:contact@innovevents.com">contact@innovevents.com</a>.
             </p>
         </div>
+
     </main>
+
+    <footer class="site-footer" id="site-footer"></footer>
+
+    <script>
+        document.getElementById('legal-notice').innerHTML = alertHtml(
+            'warning',
+            "Page en cours de rédaction : les informations d'identification de l'éditeur doivent être complétées avant la mise en ligne du site."
+        );
+    </script>
 </body>
 </html>
