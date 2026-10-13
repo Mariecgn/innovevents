@@ -171,7 +171,7 @@ export default function Root() {
         <ErrorBoundary>
             <AppContext.Provider value={{ session, route: effectiveRoute, go, goBack, login, logout }}>
                 <View style={s.root}>
-                    <StatusBar barStyle="dark-content" backgroundColor="transparent" translucent />
+                    <StatusBar barStyle="dark-content" />
                     {screen}
                     <ToastHost />
                 </View>

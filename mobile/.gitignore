@@ -1,0 +1,19 @@
+# Dépendances : à réinstaller après un clone avec "npm ci"
+node_modules/
+
+# Expo / Metro
+.expo/
+dist/
+web-build/
+expo-env.d.ts
+
+# Journaux et fichiers système
+npm-debug.*
+yarn-debug.*
+yarn-error.*
+*.log
+.DS_Store
+Thumbs.db
+
+# Variables d'environnement locales
+.env*.local

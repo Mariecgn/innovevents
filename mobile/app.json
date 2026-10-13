@@ -1,0 +1,17 @@
+{
+  "expo": {
+    "name": "Innov'Events",
+    "slug": "innovevents-mobile",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "ios": {
+      "supportsTablet": true
+    },
+    "web": {
+      "bundler": "metro"
+    },
+    "plugins": [
+      "expo-font"
+    ]
+  }
+}
