@@ -289,17 +289,19 @@
         renderProspects();
         setBusy(button, false);
         state.loaded = true;
+        document.dispatchEvent(new CustomEvent('admin:refreshed'));
     }
 
     /* ---------- Conversion prospect -> client ---------- */
 
     function resetDialog() {
         $('convert-error').innerHTML = '';
+        setBusy($('convert-confirm'), false);
+        $('convert-confirm').textContent = 'Confirmer la conversion';
         $('convert-confirm').hidden = false;
         $('convert-reject').hidden = true;
         $('convert-cancel').disabled = false;
         $('convert-cancel').textContent = 'Annuler';
-        setBusy($('convert-confirm'), false);
     }
 
     function closeDialog() {
@@ -395,10 +397,11 @@
 
     function resetRejectDialog() {
         $('reject-error').innerHTML = '';
+        setBusy($('reject-confirm'), false);
+        $('reject-confirm').textContent = 'Confirmer le refus';
         $('reject-confirm').hidden = false;
         $('reject-cancel').disabled = false;
         $('reject-cancel').textContent = 'Annuler';
-        setBusy($('reject-confirm'), false);
     }
 
     function closeRejectDialog() {

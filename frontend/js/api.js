@@ -127,8 +127,9 @@ function defaultMessage(status) {
 
 // auth: false  -> n'envoie pas le jeton (connexion, inscription, pages publiques)
 // timeout      -> délai maximal d'attente en millisecondes
+// blob: true   -> renvoie un Blob au lieu de JSON (téléchargement d'un PDF)
 async function api(path, options = {}) {
-    const { auth = true, timeout = 15000, ...init } = options;
+    const { auth = true, timeout = 15000, blob = false, ...init } = options;
 
     const headers = { ...(init.headers || {}) };
     let body = init.body;
@@ -152,7 +153,7 @@ async function api(path, options = {}) {
 
     try {
         res = await fetch(API + path, { ...init, body, headers, signal: controller.signal });
-        data = await res.json().catch(() => ({}));
+        data = res.ok && blob ? await res.blob() : await res.json().catch(() => ({}));
     } catch (e) {
         if (e && e.name === 'AbortError') {
             throw new ApiError('Le serveur met trop de temps à répondre. Réessayez dans un instant.', 0, 'TIMEOUT');

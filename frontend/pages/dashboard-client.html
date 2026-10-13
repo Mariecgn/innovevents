@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Espace client - Innov'Events</title>
-    <meta name="description" content="Votre espace client Innov'Events.">
+    <meta name="description" content="Votre espace client Innov'Events : messagerie et devis.">
     <meta name="robots" content="noindex">
     <meta name="theme-color" content="#946b4b">
     <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
@@ -37,9 +37,38 @@
             </div>
         </section>
 
+        <nav class="page-nav" aria-label="Sections de votre espace">
+            <a href="#messages-title">Messagerie <span class="chip__count" id="nav-messages-count" hidden></span></a>
+            <a href="#quotes-title">Mes devis</a>
+            <a href="#actions-title">Autres actions</a>
+        </nav>
+
+        <section class="dash-section" aria-labelledby="messages-title">
+            <div class="section-head section-head--row">
+                <div>
+                    <h2 id="messages-title">Messagerie</h2>
+                    <p class="muted">Les informations de l'agence sur vos demandes et vos devis.</p>
+                </div>
+                <button type="button" class="btn btn-outline btn-sm" id="messages-read" hidden>Tout marquer comme lu</button>
+            </div>
+
+            <div id="messages-error" class="notice-slot"></div>
+            <div id="messages-list" aria-busy="true"></div>
+        </section>
+
+        <section class="dash-section" aria-labelledby="quotes-title">
+            <div class="section-head">
+                <h2 id="quotes-title">Mes devis</h2>
+                <p class="muted">Consultez vos devis, téléchargez-les en PDF et répondez à l'agence.</p>
+            </div>
+
+            <div id="quotes-error" class="notice-slot"></div>
+            <div id="quotes-list" aria-busy="true"></div>
+        </section>
+
         <section class="dash-section" aria-labelledby="actions-title">
             <div class="section-head">
-                <h2 id="actions-title">Que souhaitez-vous faire ?</h2>
+                <h2 id="actions-title">Que souhaitez-vous faire d'autre ?</h2>
             </div>
 
             <div class="feature-grid">
@@ -66,11 +95,29 @@
             </div>
         </section>
 
-        <section class="dash-section">
-            <div id="client-notice"></div>
-        </section>
-
     </main>
+
+    <dialog id="respond-dialog" aria-labelledby="respond-title" aria-describedby="respond-desc">
+        <form id="respond-form" novalidate>
+            <div class="dialog__body">
+                <h2 id="respond-title"></h2>
+                <p id="respond-desc"></p>
+
+                <div class="field" id="respond-comment-field">
+                    <label for="respond-comment" id="respond-comment-label">Commentaire</label>
+                    <textarea id="respond-comment" maxlength="1000" rows="4" aria-describedby="respond-comment-error"></textarea>
+                    <p class="field-error" id="respond-comment-error" hidden></p>
+                </div>
+
+                <div id="respond-error" role="alert"></div>
+            </div>
+
+            <div class="dialog__actions">
+                <button type="button" class="btn btn-outline" id="respond-cancel">Annuler</button>
+                <button type="submit" class="btn" id="respond-confirm">Confirmer</button>
+            </div>
+        </form>
+    </dialog>
 
     <footer class="site-footer" id="site-footer"></footer>
 

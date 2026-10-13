@@ -26,6 +26,11 @@ function formatTime(value) {
     return d ? d.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' }) : '';
 }
 
+function formatDateTime(value) {
+    const d = toDate(value);
+    return d ? `${formatDate(d)} à ${formatTime(d)}` : '—';
+}
+
 function formatEventDates(start, end) {
     const s = toDate(start);
     const e = toDate(end);
@@ -53,6 +58,14 @@ const EVENT_STATUS = {
     EN_COURS: { label: 'En cours', tone: 'info' },
     TERMINE: { label: 'Terminé', tone: 'neutral' },
     ANNULE: { label: 'Annulé', tone: 'danger' }
+};
+
+const QUOTE_STATUS = {
+    BROUILLON: { label: 'Brouillon', tone: 'neutral' },
+    ETUDE_CLIENT: { label: 'Envoyé · en étude', tone: 'info' },
+    ACCEPTE: { label: 'Accepté', tone: 'success' },
+    MODIFICATION: { label: 'Modification demandée', tone: 'warning' },
+    REFUSE: { label: 'Refusé', tone: 'danger' }
 };
 
 function statusBadge(map, key) {
@@ -205,6 +218,71 @@ function liveValidation(form) {
             setFieldError(el, '');
         }
     });
+}
+
+/* ---------- Devis et messagerie (partagés admin / client) ---------- */
+
+const MONEY_FORMAT = new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'EUR' });
+
+function formatMoney(value) {
+    const n = Number(value);
+    return Number.isFinite(n) ? MONEY_FORMAT.format(n) : '—';
+}
+
+function messageList(items, emptyTitle, emptyText) {
+    if (!items.length) return emptyState(emptyTitle, emptyText);
+
+    return `<ul class="message-list">${items
+        .map(
+            (n) => `<li class="message${n.read ? '' : ' is-unread'}">
+                <div class="message__head">
+                    <strong>${n.read ? '' : '<span class="sr-only">Nouveau message : </span>'}${escapeHtml(n.title)}</strong>
+                    <time datetime="${escapeHtml(n.created_at)}">${escapeHtml(formatDateTime(n.created_at))}</time>
+                </div>
+                <p>${escapeHtml(n.message)}</p>
+            </li>`
+        )
+        .join('')}</ul>`;
+}
+
+// Ouvre le PDF d'un devis (route protégée : le jeton est envoyé par fetch, pas par un simple lien).
+// La fenêtre est ouverte tout de suite (clic de l'utilisateur) pour ne pas être bloquée par le navigateur.
+async function openQuotePdf(id) {
+    const win = window.open('', '_blank');
+    const name = `devis-${id}.pdf`;
+
+    const note = (html) => {
+        try {
+            win.document.title = `Devis n° ${id}`;
+            win.document.body.innerHTML = `<p style="font:16px Arial,sans-serif;padding:2rem">${html}</p>`;
+        } catch (e) {
+            /* la fenêtre n'est pas modifiable : sans importance */
+        }
+    };
+
+    if (win) note('Chargement du devis…');
+
+    try {
+        const blob = await api(`/quotes/${encodeURIComponent(id)}/pdf`, { blob: true, timeout: 30000 });
+        const url = URL.createObjectURL(blob);
+
+        if (win) {
+            note(`Si le devis ne s'affiche pas, <a href="${url}" download="${name}">téléchargez-le</a>.`);
+            win.location.href = url;
+        } else {
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = name;
+            document.body.appendChild(link);
+            link.click();
+            link.remove();
+        }
+
+        setTimeout(() => URL.revokeObjectURL(url), 10 * 60 * 1000);
+    } catch (err) {
+        if (win) win.close();
+        throw err;
+    }
 }
 
 /* ---------- Événements (carte réutilisée : accueil + page Événements) ---------- */

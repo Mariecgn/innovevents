@@ -3,6 +3,7 @@ const express = require('express');
 const pool = require('../config/db');
 const { sendMail } = require('../services/mailService');
 const { addLog } = require('../services/logService');
+const { notifyEmail } = require('../services/notificationService');
 const { auth, allow } = require('../middleware/auth');
 
 const router = express.Router();
@@ -153,6 +154,13 @@ router.post(
             [prospect.id]
         );
 
+        // Message dans la messagerie du demandeur (s'il a un compte avec cette adresse e-mail).
+        notifyEmail(prospect.email, {
+            type: 'DEMANDE_TRAITEE',
+            title: 'Votre demande de devis a été traitée',
+            message: `Bonjour ${prospect.firstname}, votre demande pour « ${prospect.company_name} » a bien été prise en charge : votre dossier client est ouvert. L’agence prépare votre devis et vous le transmettra ici, dans « Mes devis ».`
+        });
+
         res.json({
             client_id: client.insertId
         });
@@ -177,7 +185,7 @@ router.post(
 
             const [[prospect]] = await pool.query(
                 `
-                SELECT id, company_name, status
+                SELECT id, company_name, firstname, email, status
                 FROM prospects
                 WHERE id = ?
                 `,
@@ -209,6 +217,34 @@ router.post(
                 id: prospect.id,
                 entreprise: prospect.company_name
             });
+
+            try {
+                const [[existingClient]] = await pool.query(
+                    `
+                    SELECT id
+                    FROM clients
+                    WHERE LOWER(email) = LOWER(?)
+                    `,
+                    [prospect.email]
+                );
+
+                notifyEmail(
+                    prospect.email,
+                    existingClient
+                        ? {
+                            type: 'DEMANDE_DOUBLON',
+                            title: 'Votre demande de devis est déjà enregistrée',
+                            message: `Bonjour ${prospect.firstname}, une demande à votre nom (même adresse e-mail) est déjà en cours de traitement : inutile d’en envoyer une nouvelle. L’agence revient vers vous dès que votre devis est prêt.`
+                        }
+                        : {
+                            type: 'DEMANDE_REFUSEE',
+                            title: 'Votre demande de devis n’a pas pu être retenue',
+                            message: `Bonjour ${prospect.firstname}, nous ne pouvons pas donner suite à votre demande pour « ${prospect.company_name} ». N’hésitez pas à nous recontacter pour en discuter.`
+                        }
+                );
+            } catch (notificationError) {
+                console.error('Notification de refus impossible :', notificationError);
+            }
 
             return res.json({
                 status: 'ECHOUE'

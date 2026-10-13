@@ -3,6 +3,7 @@ const express = require('express');
 const pool = require('../config/db');
 const { auth, allow } = require('../middleware/auth');
 const { addLog } = require('../services/logService');
+const { listFor, markAllRead } = require('../services/notificationService');
 
 const router = express.Router();
 
@@ -272,6 +273,43 @@ router.get(
             notes,
             stats
         });
+    }
+);
+
+// Messagerie : un client voit ses messages (retrouvés par son e-mail), l'équipe voit les siens.
+router.get(
+    '/notifications',
+    auth,
+    async (req, res) => {
+        try {
+            res.json(await listFor(req.user));
+        } catch (error) {
+            console.error('Erreur messagerie :', error);
+
+            res.status(500).json({
+                message: 'Erreur lors du chargement de la messagerie.'
+            });
+        }
+    }
+);
+
+router.post(
+    '/notifications/read',
+    auth,
+    async (req, res) => {
+        try {
+            await markAllRead(req.user);
+
+            res.json({
+                message: 'Messages marqués comme lus'
+            });
+        } catch (error) {
+            console.error('Erreur messagerie :', error);
+
+            res.status(500).json({
+                message: 'Erreur lors de la mise à jour de la messagerie.'
+            });
+        }
     }
 );
 

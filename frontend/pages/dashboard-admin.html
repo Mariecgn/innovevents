@@ -37,6 +37,13 @@
             </div>
         </section>
 
+        <nav class="page-nav" aria-label="Sections du tableau de bord">
+            <a href="#prospects-title">Prospects</a>
+            <a href="#clients-title">Clients</a>
+            <a href="#quotes-title">Devis</a>
+            <a href="#messages-title">Messages <span class="chip__count" id="nav-messages-count" hidden></span></a>
+        </nav>
+
         <section class="dash-section" aria-labelledby="stats-title">
             <div class="section-head section-head--row">
                 <h2 id="stats-title">Vue d'ensemble</h2>
@@ -70,6 +77,39 @@
             <div id="prospects" aria-busy="true"></div>
         </section>
 
+        <section class="dash-section" aria-labelledby="clients-title">
+            <div class="section-head">
+                <h2 id="clients-title">Clients</h2>
+                <p class="muted">Fiches clients créées par conversion d'un prospect. Créez un devis pour un client en un clic.</p>
+            </div>
+
+            <div id="clients-error" class="notice-slot"></div>
+            <div id="clients-list" aria-busy="true"></div>
+        </section>
+
+        <section class="dash-section" aria-labelledby="quotes-title">
+            <div class="section-head">
+                <h2 id="quotes-title">Devis</h2>
+                <p class="muted">Téléchargez le PDF, puis envoyez le devis : le client le retrouve dans son espace « Mes devis » et en est informé dans sa messagerie. Si un client demande une modification, créez un nouveau devis pour le même événement.</p>
+            </div>
+
+            <div id="quotes-error" class="notice-slot"></div>
+            <div id="quotes-list" aria-busy="true"></div>
+        </section>
+
+        <section class="dash-section" aria-labelledby="messages-title">
+            <div class="section-head section-head--row">
+                <div>
+                    <h2 id="messages-title">Messages reçus</h2>
+                    <p class="muted">Réponses des clients à vos devis (acceptation, refus, demande de modification).</p>
+                </div>
+                <button type="button" class="btn btn-outline btn-sm" id="messages-read" hidden>Tout marquer comme lu</button>
+            </div>
+
+            <div id="messages-error" class="notice-slot"></div>
+            <div id="messages-list" aria-busy="true"></div>
+        </section>
+
     </main>
 
     <dialog id="convert-dialog" aria-labelledby="convert-title" aria-describedby="convert-desc">
@@ -80,7 +120,7 @@
                 (<span id="convert-contact"></span>) à partir des informations du prospect.
                 Le prospect passera au statut « Converti ».
             </p>
-            <p class="hint">Cette action ne peut pas être annulée depuis l'interface.</p>
+            <p class="hint">Le demandeur en est informé dans sa messagerie s'il a un compte. Cette action ne peut pas être annulée depuis l'interface.</p>
             <div id="convert-error" role="alert"></div>
         </div>
 
@@ -102,7 +142,7 @@
             <p id="reject-duplicate" hidden>
                 Cette demande est un doublon : un client avec la même adresse e-mail existe déjà.
             </p>
-            <p class="hint">Aucun e-mail n'est envoyé au demandeur. Cette action ne peut pas être annulée depuis l'interface.</p>
+            <p class="hint">Le demandeur en est informé dans sa messagerie s'il a un compte ; aucun e-mail n'est envoyé. Cette action ne peut pas être annulée depuis l'interface.</p>
             <div id="reject-error" role="alert"></div>
         </div>
 
@@ -112,8 +152,101 @@
         </div>
     </dialog>
 
+    <dialog id="quote-dialog" class="dialog--wide" aria-labelledby="quote-title">
+        <form id="quote-form" novalidate>
+            <div class="dialog__body">
+                <h2 id="quote-title">Nouveau devis</h2>
+                <p class="muted" id="quote-client"></p>
+
+                <fieldset class="dialog-fieldset">
+                    <legend>Événement</legend>
+
+                    <div class="field">
+                        <label for="quote-event">Événement concerné</label>
+                        <select id="quote-event"></select>
+                    </div>
+
+                    <div class="form-grid" id="quote-new-event">
+                        <div class="field field--full">
+                            <label for="ev-name">Nom de l'événement <span class="req" aria-hidden="true">*</span></label>
+                            <input id="ev-name" maxlength="180" required aria-describedby="ev-name-error">
+                            <p class="field-error" id="ev-name-error" hidden></p>
+                        </div>
+
+                        <div class="field">
+                            <label for="ev-date">Date <span class="req" aria-hidden="true">*</span></label>
+                            <input id="ev-date" type="date" required aria-describedby="ev-date-error">
+                            <p class="field-error" id="ev-date-error" hidden></p>
+                        </div>
+
+                        <div class="field">
+                            <label for="ev-type">Type <span class="req" aria-hidden="true">*</span></label>
+                            <select id="ev-type" required>
+                                <option value="Séminaire">Séminaire</option>
+                                <option value="Conférence">Conférence</option>
+                                <option value="Soirée d'entreprise">Soirée d'entreprise</option>
+                                <option value="Autre">Autre</option>
+                            </select>
+                        </div>
+
+                        <div class="field">
+                            <label for="ev-start">Début</label>
+                            <input id="ev-start" type="time" value="09:00" required>
+                        </div>
+
+                        <div class="field">
+                            <label for="ev-end">Fin</label>
+                            <input id="ev-end" type="time" value="18:00" required>
+                        </div>
+
+                        <div class="field field--full">
+                            <label for="ev-location">Lieu <span class="req" aria-hidden="true">*</span></label>
+                            <input id="ev-location" maxlength="255" required aria-describedby="ev-location-error">
+                            <p class="field-error" id="ev-location-error" hidden></p>
+                        </div>
+                    </div>
+                </fieldset>
+
+                <fieldset class="dialog-fieldset">
+                    <legend>Lignes du devis (montants HT)</legend>
+
+                    <div id="quote-lines"></div>
+
+                    <div>
+                        <button type="button" class="btn btn-outline btn-sm" id="quote-add-line">+ Ajouter une ligne</button>
+                    </div>
+
+                    <dl class="totals" id="quote-totals"></dl>
+                    <p class="hint">Calcul indicatif : le serveur recalcule les totaux (TVA 20 %).</p>
+                </fieldset>
+
+                <div id="quote-error" role="alert"></div>
+            </div>
+
+            <div class="dialog__actions">
+                <button type="button" class="btn btn-outline" id="quote-cancel">Annuler</button>
+                <button type="submit" class="btn" id="quote-submit">Créer le devis</button>
+            </div>
+        </form>
+    </dialog>
+
+    <dialog id="send-dialog" aria-labelledby="send-title" aria-describedby="send-desc">
+        <div class="dialog__body">
+            <h2 id="send-title">Envoyer ce devis au client ?</h2>
+            <p id="send-desc"></p>
+            <p class="hint">Le client en est informé dans sa messagerie et retrouve le devis dans « Mes devis ». L'e-mail est simulé : aucun e-mail réel n'est envoyé.</p>
+            <div id="send-error" role="alert"></div>
+        </div>
+
+        <div class="dialog__actions">
+            <button type="button" class="btn btn-outline" id="send-cancel">Annuler</button>
+            <button type="button" class="btn" id="send-confirm">Envoyer le devis</button>
+        </div>
+    </dialog>
+
     <footer class="site-footer" id="site-footer"></footer>
 
     <script src="/js/pages/dashboard-admin.js"></script>
+    <script src="/js/pages/admin-quotes.js"></script>
 </body>
 </html>
